@@ -1,4 +1,4 @@
-moneky
+Monkey
 ======
 
 Windows c++ monkey-matcing
