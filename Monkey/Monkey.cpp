@@ -65,7 +65,7 @@ bool FileExists(const char* name)
 
 std::unique_ptr<LibraryRAII> ReloadPatch()
 {
-	std::cerr << "ReloadPatch()\n";
+	std::cerr << "Reloading...\n";
 
 	CopyFile(dll_file, dll_file_inuse, false);
 	ThrowErrno("CopyFile");
@@ -104,20 +104,21 @@ try
 
 	int status;
 	do {
+		std::cerr << "Starting...\n";
 		void* data = init();
 		if (data == nullptr)
 			return 1;
 		do {
-			status = loop(data);
-
 			DllModTime(&next_mod_time);
 			if (next_mod_time.dwLowDateTime != mod_time.dwLowDateTime)
 			{
 				mod_time = next_mod_time;
 				hdl.reset(); //we'll be copying over the loaded dll
 				hdl = ReloadPatch();
+				status = loop(data, 1);
 			}
-
+			else
+				status = loop(data, 0);
 		} while (status == PATCH_CONTINUE);
 	} while (status == PATCH_RESTART);
 

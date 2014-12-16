@@ -3,21 +3,39 @@
 
 #include "stdafx.h"
 #include "Patch.h"
+#include "SomeClasses.h"
+#include "ClassCheck.h"
+
+Foo foo;
+
+struct UsrData
+{
+	ClassChecker check;
+	int counter;
+};
 
 PATCH_API void* init()
 {
-	return new int(0);
+	UsrData* data = new UsrData;
+	data->counter = 0;
+	return data;
 }
 
 //data is the value returned by init
 //return a value of loop_status to say what to do
-PATCH_API int loop(void* dataptr)
+PATCH_API int loop(void* dataptr, int reloaded)
 {
-	int& data = *reinterpret_cast<int*>(dataptr);
-	std::cout << data << '\n';
-	++data;
+	UsrData& data = *reinterpret_cast<UsrData*>(dataptr);
+	if (reloaded && !data.check.CheckClassSizes())
+	{
+		delete dataptr;
+		return PATCH_RESTART;
+	}
+
+	std::cout << data.counter << ' ' << reloaded << '\n';
+	++data.counter;
 	std::getchar();
-	if (data > 5)
+	if (data.counter > 5)
 	{
 		delete dataptr;
 		return PATCH_EXIT;
@@ -25,16 +43,6 @@ PATCH_API int loop(void* dataptr)
 	else
 		return PATCH_CONTINUE;
 }
-
-struct Foo
-{
-	Foo()
-	{
-		std::cout << "static ctor!\n";
-	}
-};
-
-Foo foo;
 
 /*
 // This is an example of an exported variable

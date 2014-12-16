@@ -20,9 +20,10 @@ enum loop_status
 	PATCH_RESTART = 2
 };
 
-//data is the value returned by init
+//first param is the value returned by init
+//second param is whether reload just happened
 //return a value of loop_status to say what to do
-typedef int (*loop_ty)(void*);
+typedef int (*loop_ty)(void*, int);
 
 /*
 // This class is exported from the Patch.dll
