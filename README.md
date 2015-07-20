@@ -1,4 +1,4 @@
 Monkey
 ======
 
-Windows c++ monkey-matcing
+Windows c++ monkey-patcing
